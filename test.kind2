@@ -1,0 +1,18 @@
+Color : Type
+  Red   : Color
+  Green : Color
+  Blue  : Color
+
+neg (x: Bool) : Bool = (iff x False True)
+
+iff <T: Type> (condition: Bool) (a: T) (b: T) : T {
+  iff False _ b = b
+  iff True  a _ = a
+}
+
+half (n: Nat) : Nat {
+  half (Succ (Succ pred)) =
+    let tail = (half pred)
+    (Succ tail)
+  half _                  = Zero
+}

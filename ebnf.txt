@@ -1,0 +1,40 @@
+<program> ::= <decl> <s> (<white> <decl> "\n"*)* "\n"*
+
+<s> ::= (" " | "\n")*
+<white> ::= (" " | "\n")+
+<br> ::= ("\n")*
+<num> ::= [0-9]+
+<digit> ::= [0-9]
+<letter> ::= [A-z]
+<name_char_1> ::= <letter> | "_"
+<name_char_2> ::= <name_char_1> | <digit>
+<var> ::= <name_char_1> <name_char_2>*
+
+<typed_param> ::=
+    "(" <s> <var> <s> ":" <s> <expr> <s> ")"
+  | "<" <s> <var> <s> ":" <s> <expr> <s> ">"
+<decl> ::= <var> (<s> <typed_param>)* <s> ":" <s> <expr> <s> <def>? <s> ";"?
+<def> ::=
+    "=" <s> <expr>
+  | "{" ( <rule> )* <s> "}"
+<rule> ::= <s> <free_app> <s> "=" <s> <expr> <s> ";"?
+
+<naked_app> ::= <expr> (<white> <expr>)*
+<app> ::= "(" <naked_app> ")"
+<free_app> ::= <app> | <naked_app>
+
+<expr> ::= <num>
+  | <var>
+  | "(" <expr> ")"
+  |	<let> <expr>
+  | <app>
+
+<let> ::= <s> "let" <s> <free_app> <s> "=" <s> <expr> "in"? <s>
+
+
+
+<bop> ::= "&&" | "||"
+<bool> ::= "true" | "false"
+<eq_op> ::= "==" | "!="
+<cmp_op> ::= ">" | ">=" | "<" | "<="
+
