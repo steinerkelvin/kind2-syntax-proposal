@@ -5,6 +5,8 @@ Color : Type
 
 neg (x: Bool) : Bool = (iff x False True)
 
+Not (T: Type) : Type = @T -> Empty
+
 iff <T: Type> (condition: Bool) (a: T) (b: T) : T {
   iff False _ b = b
   iff True  a _ = a
@@ -16,3 +18,8 @@ half (n: Nat) : Nat {
     (Succ tail)
   half _                  = Zero
 }
+
+map
+  <C: @Type -> Type> <MC: Mappable C>
+  <A: Type> <B: Type> (f: @A -> B) (xs: C A) : C B =
+    (MC.map f xs)

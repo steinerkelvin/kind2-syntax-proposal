@@ -17,12 +17,7 @@ Color : Type
   Green : Color
   Blue  : Color
 
-Not (T: Type) : Type = @(:T) -> Empty
-
-iff <T: Type> (condition: Bool) (a: T) (b: T) : T {
-  iff False _ b = b
-  iff True  a _ = a
-}
+Not (T: Type) : Type = @T -> Empty
 
 // Negates a boolean
 neg (x: Bool) : Bool {
@@ -32,6 +27,14 @@ neg (x: Bool) : Bool {
 
 // Alternative
 neg (x: Bool) : Bool = (iff x False True)
+
+iff <T: Type> (condition: Bool) (a: T) (b: T) : T {
+  iff False _ b = b
+  iff True  a _ = a
+}
+
+// Function returning lambda
+add_this (n: Nat) : @Nat -> Nat = @x => (add x 2)
 
 double (n: Nat) : Nat {
   double Zero        = Zero
@@ -79,8 +82,8 @@ List.Mappable: Mappable<List> = {
   (Mappable map)
 
 map
-  <C: Type -> Type> <MC: Mappable C>
-  <A: Type> <B: Type> (f: A -> B) (xs: C A) : (C B) =
+  <C: @Type -> Type> <MC: Mappable C>
+  <A: Type> <B: Type> (f: @A -> B) (xs: C A) : C B =
     (MC.map f xs)
 
 record Add <T: Type> {

@@ -8,28 +8,55 @@
 <letter> ::= [A-z]
 <name_char_1> ::= <letter> | "_"
 <name_char_2> ::= <name_char_1> | <digit>
-<var> ::= <name_char_1> <name_char_2>*
+<name> ::= <name_char_1> <name_char_2>*
+<id> ::= <name> ("." <name>)*
+<var> ::= <id>
 
 <typed_param> ::=
-    "(" <s> <var> <s> ":" <s> <expr> <s> ")"
-  | "<" <s> <var> <s> ":" <s> <expr> <s> ">"
-<decl> ::= <var> (<s> <typed_param>)* <s> ":" <s> <expr> <s> <def>? <s> ";"?
+    "(" <s> <name> <s> ":" <s> <enc_expr> <s> ")"
+  | "<" <s> <name> <s> ":" <s> <enc_expr> <s> ">"
+
+<forall_param> ::=
+    <typed_param>
+  | <expr>
+  | "<" <s> <enc_expr> <s> ">"
+
+<param> ::=
+    <name>
+  | <typed_param>
+
+<decl> ::= <id> (<s> <typed_param>)* <s> ":" <s> <enc_expr> <s> <def>? <s> ";"?
 <def> ::=
     "=" <s> <expr>
   | "{" ( <rule> )* <s> "}"
-<rule> ::= <s> <free_app> <s> "=" <s> <expr> <s> ";"?
-
-<naked_app> ::= <expr> (<white> <expr>)*
-<app> ::= "(" <naked_app> ")"
-<free_app> ::= <app> | <naked_app>
+<rule> ::= <s> <enc_app> <s> "=" <s> <expr> <s> ";"?
 
 <expr> ::= <num>
   | <var>
   | "(" <expr> ")"
   |	<let> <expr>
   | <app>
+  | <forall>
+  | <lambda>
 
-<let> ::= <s> "let" <s> <free_app> <s> "=" <s> <expr> "in"? <s>
+<enc_expr> ::= <num>
+  | <var>
+  | "(" <expr> ")"
+  |	<let> <expr>
+  | <enc_app>
+  | <forall>
+  | <lambda>
+
+<forall> ::= "@" (<s> <forall_param> <s> "->" <s>)+ <expr>
+<lambda> ::= "@" (<s> <param> <s> "=>" <s>)+ <expr>
+
+<naked_app> ::= <expr> (<white> <expr>)*
+<app> ::= "(" <naked_app> ")"
+<enc_app> ::= <app> | <naked_app>
+
+<let> ::= <s> "let" <s> <enc_app> <s> "=" <s> <expr> "in"? <s>
+
+
 
 
 
@@ -37,4 +64,3 @@
 <bool> ::= "true" | "false"
 <eq_op> ::= "==" | "!="
 <cmp_op> ::= ">" | ">=" | "<" | "<="
-
