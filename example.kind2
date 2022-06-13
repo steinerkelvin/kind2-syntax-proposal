@@ -1,5 +1,5 @@
 type Empty { }
-type Unit { Un }
+type Unit  { Un }
 
 // ADT
 type Bool {
@@ -10,6 +10,11 @@ type Bool {
 type Nat {
   Zero
   (Succ (pred: Nat))
+}
+
+struct Pair <A: Type> <B: Type> {
+  fst: A
+  snd: B
 }
 
 Color : Type
@@ -28,13 +33,14 @@ neg (x: Bool) : Bool {
 // Alternative
 neg (x: Bool) : Bool = (iff x False True)
 
-iff <T: Type> (condition: Bool) (a: T) (b: T) : T {
-  iff False _ b = b
-  iff True  a _ = a
+iff <T: Type> (condition: Bool) (when_true: T) (when_false: T) : T {
+  iff False _ x = x
+  iff True x _ = x
 }
 
 // Function returning lambda
-add_this (n: Nat) : @Nat -> Nat = @x => (add x 2)
+add_this (n: Nat) : @Nat -> Nat =
+  @x => (add x 2)
 
 double (n: Nat) : Nat {
   double Zero        = Zero
@@ -48,10 +54,11 @@ half (n: Nat) : Nat {
   half _                  = Zero
 }
 
-cong (T: Type) (U: Typ) (a: T) (b: T) (f: @(x: T) -> U) (e: (a == b)) : (f a == f b)
-cong _ _ a b f e =
-  rewrite x with e on (f x == f b) in
-  refl (f b)
+cong (T: Type) (U: Type) (a: T) (b: T) (f: @(x: T) -> U) (e: (a = b)) : f a = f b {
+  cong _ _ a b f e =
+    rewrite x with e on (f x = f b) in
+    refl (f b)
+}
 
 BFT (n: Nat) : Nat {
   BFT Zero        = (refl Zero)
@@ -62,14 +69,14 @@ BFT (n: Nat) : Nat {
 }
 
 // True isn't False
-true_is_not_false : (Not (True == False)) =
+true_is_not_false : Not (True = False) =
   @e =>
     rewrite x with e on (if x Empty Unit) in Un
 
 // Higher-level stuff
 
 record Mappable (T: Type) {
-  map : {a: Type} {b: Type} (f: a -> b) (xs: T a) : (T b)
+  map : <a: Type> <b: Type> (f: a -> b) (xs: T a) : (T b)
 }
 
 List.Mappable: Mappable<List> = {
@@ -83,12 +90,13 @@ List.Mappable: Mappable<List> = {
 
 map
   <C: @Type -> Type> <MC: Mappable C>
-  <A: Type> <B: Type> (f: @A -> B) (xs: C A) : C B =
+  <A: Type> <B: Type>
+  (f: @A -> B) (xs: C A) : C B =
     (MC.map f xs)
 
 record Add <T: Type> {
   add  a b : T
-  comm a b : ((add a b) == (add b a))
+  comm a b : (add a b = add b a)
 }
 
 Nat.Add : Add Nat = 
@@ -98,7 +106,7 @@ Nat.Add : Add Nat =
       add (Succ pred) b = add pred (Succ b)
     }
 
-    fn comm (a: T) (b: T) : (add a b) == (add b a) {
+    fn comm (a: T) (b: T) : (add a b) = (add b a) {
       comm Zero b =
         (mirror (add b 0) b Nat.add.zero_right)
       comma a b =
@@ -109,4 +117,3 @@ Nat.Add : Add Nat =
 
 map_double <C: @Type -> Type> <_: Mappable C> (N: Type) <N.Add: Add N> (xs: C N) : C N =
   (map <C> (@x => (N.Add.add x x)) xs)
-
