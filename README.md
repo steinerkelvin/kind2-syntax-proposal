@@ -1,5 +1,11 @@
 # kind2-syntax-proposal
 
+[Example File](./example.kind2)
+
+[Grammar prototype](./ebnf.txt)
+
+---
+
 Please someone get me a decent tool to prototype grammars. I'm getting mad.
 
 ---
@@ -13,6 +19,7 @@ Please someone get me a decent tool to prototype grammars. I'm getting mad.
 
 ### Inspirations
 
+- Kind 1
 - Rust
 - Typescript
 - ML-like
