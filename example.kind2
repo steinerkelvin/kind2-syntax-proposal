@@ -1,16 +1,19 @@
-type Empty { }
-type Unit  { Un }
+// ADTs
 
-// ADT
+// `type` keyword could be replaced by `data`, `enum`, etc
+
 type Bool {
   False
   True
 }
 
 type Nat {
-  Zero
+  (Zero)
   (Succ (pred: Nat))
 }
+
+type Empty { }
+struct Unit { }
 
 struct Pair <A: Type> <B: Type> {
   fst: A
@@ -22,7 +25,8 @@ Color : Type
   Green : Color
   Blue  : Color
 
-Not (T: Type) : Type = @T -> Empty
+Not (T: Type) : Type =
+  @T -> Empty
 
 // Negates a boolean
 neg (x: Bool) : Bool {
@@ -33,60 +37,59 @@ neg (x: Bool) : Bool {
 // Alternative
 neg (x: Bool) : Bool = (iff x False True)
 
+// If-then-else function
 iff <T: Type> (condition: Bool) (when_true: T) (when_false: T) : T {
   iff False _ x = x
-  iff True x _ = x
+  iff True  x _ = x
 }
 
 // Function returning lambda
 add_this (n: Nat) : @Nat -> Nat =
   @x => (add x 2)
 
-double (n: Nat) : Nat {
-  double Zero        = Zero
-  double (Succ pred) = (Succ (Succ pred))
+Nat.double (n: Nat) : Nat {
+  Nat.double (Zero)      = Zero
+  Nat.double (Succ pred) = (Succ (Succ pred))
 }
 
 half (n: Nat) : Nat {
   half (Succ (Succ pred)) =
     let tail = (half pred)
     (Succ tail)
-  half _                  = Zero
+  half x =
+    Zero
 }
 
-cong (T: Type) (U: Type) (a: T) (b: T) (f: @(x: T) -> U) (e: (a = b)) : f a = f b {
+cong <T: Type> <U: Type> <a: T> <b: T> (f: @(x: T) -> U) (e: (a = b)) : f a = f b {
   cong _ _ a b f e =
     rewrite x with e on (f x = f b) in
     refl (f b)
 }
 
+// Black-Friday theorem
 BFT (n: Nat) : Nat {
   BFT Zero        = (refl Zero)
   BFT (Succ pred) =
     let e0 = (BFT pred)
-    let e1 = (cong _ _ _ _ (@x => Succ x) e0)
+    let e1 = (cong (@x => (Succ x)) e0)
     e1
 }
 
 // True isn't False
 true_is_not_false : Not (True = False) =
   @e =>
-    rewrite x with e on (if x Empty Unit) in Un
+    rewrite x with e on (if x Empty Unit) in Unit.new
 
 // Higher-level stuff
+// ==================
+
+// Mappable/Functor typeclass
 
 record Mappable (T: Type) {
   map : <a: Type> <b: Type> (f: a -> b) (xs: T a) : (T b)
 }
 
-List.Mappable: Mappable<List> = {
-  let {
-    map {a: Type} {b: Type} (f: a -> b) (xs: List a) : (List b) {
-      map _  List.Nil        = Nil
-      map f (List.Cons x xs) = (List.Cons (f x) (map f xs))
-    }
-  } in
-  (Mappable map)
+// The generic `map` function
 
 map
   <C: @Type -> Type> <MC: Mappable C>
@@ -94,26 +97,40 @@ map
   (f: @A -> B) (xs: C A) : C B =
     (MC.map f xs)
 
+// Mappable implementation for List
+
+List.Mappable: Mappable<List> = {
+  (Mappable List.map)
+
+List.map {a: Type} {b: Type} (f: a -> b) (xs: List a) : (List b) {
+  List.map _  List.Nil        = Nil
+  List.map f (List.Cons x xs) = (List.Cons (f x) (map f xs))
+
+// Add typeclass
 record Add <T: Type> {
   add  a b : T
-  comm a b : (add a b = add b a)
+  comm a b : (add a b = add b a)  // This is just an example of theorem that could be required
 }
 
-Nat.Add : Add Nat = 
-  let {
-    fn add (a: Nat) (b: Nat) : Nat
-      add Zero        b = b
-      add (Succ pred) b = add pred (Succ b)
-    }
+// Implementation of Add for Nat
 
-    fn comm (a: T) (b: T) : (add a b) = (add b a) {
-      comm Zero b =
-        (mirror (add b 0) b Nat.add.zero_right)
-      comma a b =
-        [...]
-    }
-  } in
-    (Add <Nat> add comm)
+Nat.Add : Add Nat =
+  (Add <Nat> add comm)
+
+fn Nat.add (a: Nat) (b: Nat) : Nat
+  Nat.add (Zero)      b = b
+  Nat.add (Succ pred) b = (Nat.add pred (Succ b))
+}
+
+fn Nat.comm (a: T) (b: T) : (add a b) = (add b a) {
+  comm Zero b =
+    (mirror (add b 0) b Nat.add.zero_right)
+  comma a b =
+    [...]
+}
+
+// Example of typeclass usage
+// and passing one implicit parameter
 
 map_double <C: @Type -> Type> <_: Mappable C> (N: Type) <N.Add: Add N> (xs: C N) : C N =
   (map <C> (@x => (N.Add.add x x)) xs)
