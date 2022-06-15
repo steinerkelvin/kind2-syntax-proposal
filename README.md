@@ -8,16 +8,14 @@ We'll be working on a tree-sitter grammar on [this PR on Kindelia/Kind2](https:/
 
 ---
 
-Please someone get me a decent tool to prototype grammars. I'm getting mad.
-
----
-
 - Whitespace independent
 - Context-free
 - Simple and efficient parser
+- (thus LR1)
 - Readability
 - Familiar syntax when possible
-- Tree-sitter?
+
+---
 
 ### Inspirations
 
@@ -28,12 +26,15 @@ Please someone get me a decent tool to prototype grammars. I'm getting mad.
 
 ### Implicit and erased params
 
-Implicit parameter:
-```
-<x: T>
-```
+TODO: discuss options.
 
-TODO: rationale for preferring used `<>` to convey implicitness instead of erasedness.
+- A. `<>` convey implicitness and tag to convey erasedness
+- B. `<>` for both and `{}` for implicit
+- C. `<>` for both (+ tags)
+
+#### A. `<>` to convey implicitness and tag to convey erasedness
+
+Implicit parameter: `<x: T>`.
 
 Erased parameter alternatives:
 ```
@@ -42,8 +43,30 @@ Erased parameter alternatives:
 3.  (#x: T)  |  <#x: T>
 ```
 
-### TODO
+Very orthogonal. Kinda ugly.
 
-- if-then-else
-- other "control" structures
-- ?
+#### B. `<>` for both and `{}` for implicit
+
+```
+(x: A)  ... normal
+(-x: A) ... erased
+{x: A}  ... implicit
+<x: A>  ... implicit & erased
+```
+
+I don't like how this creates 4 different syntaxes for a parameter while we could have only 2.
+
+#### C. `<>` convey both (+ tags)
+
+Default on `()` is non-erased.
+Default on `<>` is erased.
+
+So we need a tag to convey both erasedness and non-erasedness:
+```
+(x: A)  ... normal
+(-x: A) ... erased
+<+x: A> ... implicit
+<x: A>  ... implicit & erased
+```
+
+Still orthogonal and less ugly. `+` and `-` tags have naturally oppossite semantics so I'll non-ironically defend this option.
