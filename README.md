@@ -4,6 +4,8 @@
 
 [Grammar prototype](./ebnf.txt)
 
+We'll be working on a tree-sitter grammar on [this PR on Kindelia/Kind2](https://github.com/Kindelia/Kind2/pull/20).
+
 ---
 
 Please someone get me a decent tool to prototype grammars. I'm getting mad.
