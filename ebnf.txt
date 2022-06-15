@@ -31,17 +31,19 @@
   | "{" ( <rule> )* <s> "}"
 <rule> ::= <s> <enc_app> <s> "=" <s> <expr> <s> ";"?
 
-<expr> ::= <num>
+<expr> ::= 
+   "(" <expr> ")"
+  | <num>
   | <var>
-  | "(" <expr> ")"
   |	<let> <expr>
   | <app>
   | <forall>
   | <lambda>
 
-<enc_expr> ::= <num>
+<enc_expr> ::= 
+    "(" <expr> ")"
+  | <num>
   | <var>
-  | "(" <expr> ")"
   |	<let> <expr>
   | <enc_app>
   | <forall>
