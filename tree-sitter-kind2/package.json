@@ -1,0 +1,14 @@
+{
+  "name": "tree-sitter-kind2",
+  "version": "0.1.0",
+  "main": "bindings/node",
+  "repository": "https://github.com/quleuber/kind2-syntax-proposal/",
+  "author": "Kelvin Santos",
+  "license": "MIT",
+  "dependencies": {
+    "nan": "^2.16.0"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "^0.20.6"
+  }
+}
