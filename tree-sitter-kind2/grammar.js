@@ -16,7 +16,7 @@ module.exports = grammar({
 
     // Tokens
 
-    _comment : $ => token(seq('//', /(.)*/)),
+    _comment: $ => token(seq('//', /(.)*/)),
 
     name: _ => /[a-zA-Z_][a-zA-Z0-9_]*/,
     nat: _ => /[0-9]+/,
@@ -45,7 +45,10 @@ module.exports = grammar({
         $._free_exprs,
       )),
 
-    _expr_parens: $ => seq('(', $._naked_exprs, ')'),
+    _expr_parens: $ => choice(
+      seq('(', $._naked_exprs, ')'),
+      seq('{', $._naked_exprs, '}'),
+    ),
 
     // _alt_expr: $ =>
     //   choice(
@@ -120,11 +123,20 @@ module.exports = grammar({
       field("id", $.name),
       $._destruct_pattern
     ),
-    _destruct_pattern: $ => seq(
-        '(',
+    _destruct_pattern: $ =>
+      choice(
+        seq(
+          '(',
           field("id", $.name),
           field("patterns", optional($.patterns)),
-        ')',
+          ')',
+        ),
+        seq(
+          '{',
+          field("id", $.name),
+          field("patterns", optional($.patterns)),
+          '}',
+        ),
       ),
 
     _def: $ =>
@@ -145,7 +157,8 @@ module.exports = grammar({
       ),
 
     _rule_lhs: $ => seq(
-      field("id", $.path),
+      "|",
+      // field("id", $.path),
       field("patterns", optional($.patterns)),
     ),
   }
