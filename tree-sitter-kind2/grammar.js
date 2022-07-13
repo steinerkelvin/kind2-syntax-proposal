@@ -169,26 +169,24 @@ module.exports = grammar({
 
     _def: $ =>
       choice(
-        // field('body', seq("=", $.expr)),
-        field('body', $.fn_body),
+        field('body', seq("=", $.expr)),
         field('rules', $.rules),
       ),
 
-    single_def: $ => seq('=', $.expr),
-
     rules: $ => seq("{", repeat($.rule), "}"),
-    fn_body: $ => seq("{", $.naked_expr, "}"),
+
+    // single_def: $ => seq('=', $.expr),
+    // fn_body: $ => seq("{", $.naked_expr, "}"),
 
     rule: $ =>
       seq(
         field('lhs', $._rule_lhs),
-        "=>",
+        "=",
         field('rhs', $.expr),
       ),
 
     _rule_lhs: $ => seq(
-      "|",
-      // field("id", $.path),
+      field("id", $.path),
       field("patterns", optional($.patterns)),
     ),
   }

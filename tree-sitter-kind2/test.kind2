@@ -8,24 +8,23 @@ type List <T: Type> {
   {Cons (head: T) (tail: T)}
 }
 
-neg (x: Bool) : Bool {
+neg (x: Bool) : Bool =
   (iff x False True)
-}
 
 iff <T: Type> (condition: Bool) (a: T) (b: T) : T {
-  | False _ b => b
-  | True  a _ => a
+  iff False _ b = b
+  iff True  a _ = a
 }
 
 half (n: Nat) : Nat {
-  | {Succ {Succ pred}} => {
+  half {Succ {Succ pred}} = {
       let tail = (half pred)
       {Succ tail}
     }
-  | _ => Zero
+  half _ = Zero
 }
 
-Main (x: Bool) : Empty {
+Main (x: Bool) : Empty = {
   let n1 =
     if (not x)
       then (Succ Zero)
@@ -42,15 +41,12 @@ Main (x: Bool) : Empty {
   b
 }
 
-Not (T: Type) : Type {
+Not (T: Type) : Type =
   @T -> Empty
-}
 
 map
   <C: @Type -> Type> <MC: Mappable C>
   <A: Type> <B: Type>
   (f: @A -> B) (xs: C A)
-  : (C B)
-{
-  (MC.map f xs)
-}
+  : (C B) =
+    (MC.map f xs)
