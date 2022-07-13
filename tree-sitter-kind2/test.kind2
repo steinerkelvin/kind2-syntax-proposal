@@ -1,28 +1,43 @@
-Color : Type
-  Red   : Color
-  Green : Color
-  Blue  : Color
+type Bool {
+  False
+  True
+}
 
-neg (x: Bool) : Bool = (iff x False True)
+type List <T: Type> {
+  Nil
+  {Cons (head: T) (tail: T)}
+}
+
+Neg (x: Bool) : Bool {
+  (iff x False True)
+}
 
 iff <T: Type> (condition: Bool) (a: T) (b: T) : T {
-  iff False _ b = b
-  iff True  a _ = a
+  | False _ b => b
+  | True  a _ => a
 }
 
 half (n: Nat) : Nat {
-   half (Succ (Succ pred)) =
-     let tail = (half pred)
-     (Succ tail)
-  half _                  = Zero
+  | {Succ {Succ pred}} => {
+      let tail = (half pred)
+      {Succ tail}
+    }
+  | _ => Zero
 }
 
-Not (T: Type) : Type =
+Main: Empty {
+  // let b = if 
+}
+
+Not (T: Type) : Type {
   @T -> Empty
+}
 
 map
   <C: @Type -> Type> <MC: Mappable C>
   <A: Type> <B: Type>
   (f: @A -> B) (xs: C A)
-  : (C B) =
-    (MC.map f xs)
+  : (C B)
+{
+  (MC.map f xs)
+}

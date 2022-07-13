@@ -105,7 +105,24 @@ module.exports = grammar({
     // Declarations
     // ------------
 
-    decl: $ =>
+    decl: $ => choice($.type_decl, $.definition),
+
+    type_decl: $ => seq(
+      "type",
+      field('id', $.name),
+      field('params', optional($.typed_params)),
+      "{",
+      field('variants', optional($.variants)),
+      "}",
+    ),
+
+    variants: $ => repeat1($.variant),
+    variant: $ => choice(
+      $.name,
+      seq("{", $.name, repeat($.param), "}")
+    ),
+
+    definition: $ =>
       seq(
         // 'def',
         field("id", $.path),
@@ -141,19 +158,21 @@ module.exports = grammar({
 
     _def: $ =>
       choice(
-        field("body", seq('=', $.free_expr)),
-        // field("body", seq('=', $.expr, ";")),
-        field("rules", $.rules),
+        // field('body', seq("=", $.free_expr)),
+        field('body', $.fn_body),
+        field('rules', $.rules),
       ),
 
     single_def: $ => seq('=', $.free_expr),
-    rules: $ => seq('{', repeat($.rule), '}'),
+
+    rules: $ => seq("{", repeat($.rule), "}"),
+    fn_body: $ => seq("{", $.expr, "}"),
 
     rule: $ =>
       seq(
-        field("lhs", $._rule_lhs),
-        "=",
-        field("rhs", $.free_expr),
+        field('lhs', $._rule_lhs),
+        "=>",
+        field('rhs', $.free_expr),
       ),
 
     _rule_lhs: $ => seq(
