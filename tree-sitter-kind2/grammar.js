@@ -8,7 +8,7 @@ module.exports = grammar({
     $._comment,
   ],
   inline: $ => [
-    $.free_expr,
+    $.expr,
   ],
 
   rules: {
@@ -31,15 +31,15 @@ module.exports = grammar({
     number: $ => choice($.nat, $.float),
 
     // Can be used everywhere
-    free_expr: $ => alias(
+    expr: $ => alias(
       prec(1, choice(
         $._expr_parens,
         $._free_exprs,
       )),
-      $.expr,
+      $.naked_expr,
     ),
     // Cannot be used everywhere
-    expr: $ => // alias(
+    naked_expr: $ => // alias(
       prec(0, choice(
         $._naked_exprs,     // TODO: test
         $._free_exprs,
@@ -52,8 +52,8 @@ module.exports = grammar({
 
     // _alt_expr: $ =>
     //   choice(
-    //     $.free_expr,
-    //     seq($.expr, ";"),
+    //     $.expr,
+    //     seq($.naked_expr, ";"),
     //   ),
 
     _free_exprs: $ => choice(
@@ -73,17 +73,17 @@ module.exports = grammar({
 
     // Let
     let: $ => seq(
-      'let',
-      field("var", $.var),
-      '=',
-      field("expr", $.free_expr),
+      "let",
+      field('var', $.var),
+      "=",
+      field('expr', $.expr),
       optional($.let_end),
-      field("body", $.free_expr),
+      field('body', $.expr),
     ),
 
     // Lambda and Forall
-    lambda: $ => seq('@', field("params", $._lambda_params), field("body", $.free_expr)),
-    forall: $ => seq('@', field("params", $._forall_params), field("body", $.free_expr)),
+    lambda: $ => seq('@', field("params", $._lambda_params), field("body", $.expr)),
+    forall: $ => seq('@', field("params", $._forall_params), field("body", $.expr)),
 
     _lambda_params: $ => repeat1(seq($.param, '=>')),
     _forall_params: $ => repeat1(seq($.forall_param, '->')),
@@ -95,12 +95,12 @@ module.exports = grammar({
       $.typed_param
     ),
     typed_param: $ => choice(
-      seq('(', $.name, ':', $.expr, ')'),
-      seq('<', $.name, ':', $.expr, '>'),
+      seq('(', $.name, ':', $.naked_expr, ')'),
+      seq('<', $.name, ':', $.naked_expr, '>'),
     ),
 
     // Function application
-    naked_app: $ => prec.left(0, seq($.free_expr, repeat($.free_expr))),
+    naked_app: $ => prec.left(0, seq($.expr, repeat($.expr))),
 
     // Declarations
     // ------------
@@ -128,7 +128,7 @@ module.exports = grammar({
         field("id", $.path),
         field("params", optional($.typed_params)),
         ':',
-        field("type", $.free_expr),
+        field("type", $.expr),
         optional($._def),
       ),
 
@@ -158,21 +158,21 @@ module.exports = grammar({
 
     _def: $ =>
       choice(
-        // field('body', seq("=", $.free_expr)),
+        // field('body', seq("=", $.expr)),
         field('body', $.fn_body),
         field('rules', $.rules),
       ),
 
-    single_def: $ => seq('=', $.free_expr),
+    single_def: $ => seq('=', $.expr),
 
     rules: $ => seq("{", repeat($.rule), "}"),
-    fn_body: $ => seq("{", $.expr, "}"),
+    fn_body: $ => seq("{", $.naked_expr, "}"),
 
     rule: $ =>
       seq(
         field('lhs', $._rule_lhs),
         "=>",
-        field('rhs', $.free_expr),
+        field('rhs', $.expr),
       ),
 
     _rule_lhs: $ => seq(
