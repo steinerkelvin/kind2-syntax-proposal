@@ -62,6 +62,7 @@ module.exports = grammar({
       $.let,
       $.lambda,
       $.forall,
+      $.if,
     ),
     _naked_exprs: $ => choice(
       $.naked_app,
@@ -97,6 +98,16 @@ module.exports = grammar({
     typed_param: $ => choice(
       seq('(', $.name, ':', $.naked_expr, ')'),
       seq('<', $.name, ':', $.naked_expr, '>'),
+    ),
+
+    // If-else
+    if: $ => seq(
+      "if",
+      field('cond', $.expr),
+      optional("then"),
+      field('then', $.expr),
+      "else",
+      field('else', $.expr),
     ),
 
     // Function application

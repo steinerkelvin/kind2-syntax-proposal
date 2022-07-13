@@ -8,7 +8,7 @@ type List <T: Type> {
   {Cons (head: T) (tail: T)}
 }
 
-Neg (x: Bool) : Bool {
+neg (x: Bool) : Bool {
   (iff x False True)
 }
 
@@ -25,8 +25,21 @@ half (n: Nat) : Nat {
   | _ => Zero
 }
 
-Main: Empty {
-  // let b = if 
+Main (x: Bool) : Empty {
+  let n1 =
+    if (not x)
+      then (Succ Zero)
+      else (Succ (Succ Zero))
+
+  let n2 =
+    if x {
+      let kek = (double n1)
+      (pred kek)
+    } else {
+      (pred kek)
+    }
+
+  b
 }
 
 Not (T: Type) : Type {
